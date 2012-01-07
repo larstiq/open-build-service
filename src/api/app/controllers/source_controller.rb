@@ -1493,8 +1493,15 @@ class SourceController < ApplicationController
       oprj.flags.each do |f|
         p.flags.create(:status => f.status, :flag => f.flag, :architecture => f.architecture, :repo => f.repo)
       end
+
+      oprj.linkedprojects.each do |l|
+
+        p.linkedprojects.create( :linked_remote_project_name => l.linked_remote_project_name , :position => l.position ) if l.linked_remote_project_name
+        p.linkedprojects.create( :linked_db_project => l.linked_db_project.name , :position => l.position ) if l.linked_db_project
+      end
+
       oprj.repositories.each do |repo|
-        r = p.repositories.create :name => repo.name
+        r = p.repositories.create :name => repo.name, :linkedbuild => repo.linkedbuild
         r.architectures = repo.architectures
         position = 0
         repo.path_elements.each do |pe|

@@ -2032,6 +2032,7 @@ sub update_project_meta {
   # check if the project meta has critical change
   return 0 unless identical($proj->{'build'}, $oldproj->{'build'});
   # XXX: could be more clever here
+  return 0 unless identical($proj->{'link'}, $oldproj->{'link'});
   return 0 unless identical($proj->{'repository'}, $oldproj->{'repository'});
 
   # check macro definitions
