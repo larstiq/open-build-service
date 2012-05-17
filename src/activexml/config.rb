@@ -88,7 +88,10 @@ module ActiveXML
 
         def replace_server_if_needed( uri )
           if not uri.host
-            uri.scheme, uri.host, uri.port = get_default_server(uri.scheme)
+            uri.scheme, uri.host, uri.port, path = get_default_server(uri.scheme)
+            if path and uri.path
+              uri.path = path + uri.path
+            end
           end
         end
 
@@ -103,7 +106,7 @@ module ActiveXML
         def get_default_server( transport )
           ds = @default_servers[transport.to_s]
           ds_uri = URI.parse(ds)
-          return ds_uri.scheme, ds_uri.host, ds_uri.port
+          return ds_uri.scheme, ds_uri.host, ds_uri.port, ds_uri.path
         rescue
           return nil, ds, nil
         end

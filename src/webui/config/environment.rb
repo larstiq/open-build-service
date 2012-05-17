@@ -71,6 +71,8 @@ init = Rails::Initializer.run do |config|
 end
 
 ActionController::Base.relative_url_root = CONFIG['relative_url_root'] if CONFIG['relative_url_root']
+FRONTEND_SLUG = ""
+FRONTEND_SLUG = CONFIG['api_relative_url_root'] if CONFIG['api_relative_url_root']
 
 require 'ostruct'
 
@@ -117,7 +119,7 @@ end
 
 ActiveXML::Base.config do |conf|
   conf.setup_transport do |map|
-    map.default_server :rest, "#{FRONTEND_PROTOCOL}://#{FRONTEND_HOST}:#{FRONTEND_PORT}"
+    map.default_server :rest, "#{FRONTEND_PROTOCOL}://#{FRONTEND_HOST}:#{FRONTEND_PORT}#{FRONTEND_SLUG}"
 
     map.connect :project, "rest:///source/:name/_meta?:view",
       :all    => "rest:///source/",

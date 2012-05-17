@@ -383,7 +383,10 @@ module ActiveXML
 
         #set default host if not set in uri
         if not url.host
-          url.scheme, url.host, url.port = ActiveXML::Config::TransportMap.get_default_server("rest")
+          url.scheme, url.host, url.port, path = ActiveXML::Config::TransportMap.get_default_server("rest")
+          if path and url.path
+             url.path = path + url.path
+          end
         end
 
         logger.debug "--> direct_http url: #{url.inspect}"
