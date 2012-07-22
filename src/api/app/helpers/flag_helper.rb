@@ -68,6 +68,9 @@ module FlagHelper
 	     raise SaveError.new( "Error: Architecture type '#{xmlflag.arch}' not found." ) if arch.nil?
 	   end
 
+           package = xmlflag.package if xmlflag.has_attribute? :package
+           package ||= nil
+
 	   repo = xmlflag.repository if xmlflag.has_attribute? :repository
 	   repo ||= nil
 
@@ -76,6 +79,7 @@ module FlagHelper
 	     #set the flag attributes
 	     flag.repo = repo
 	     flag.architecture = arch
+	     flag.package = package
 	   end
 	   position += 1
 	 end
