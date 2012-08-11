@@ -1491,26 +1491,18 @@ class SourceController < ApplicationController
       oprj = DbProject.get_by_name( oproject )
       p = DbProject.new :name => project_name, :title => oprj.title, :description => oprj.description
       p.add_user @http_user, "maintainer"
-      build_disabled = false
-      publish_disabled = false
 
       oprj.flags.each do |f|
         p.flags.create(:status => f.status, :flag => f.flag, :architecture => f.architecture, :repo => f.repo)
-        if f.flag == "build" and f.status == "disable"
-          build_disabled = true
-        end
-        if f.flag == "publish" and f.status == "disable"
-          publish_disabled = true
-        end
       end
 
-      p.flags.create(:status => 'disable', :flag => 'build') if not build_disabled
-      p.flags.create(:status => 'disable', :flag => 'publish') if not publish_disabled
+      p.flags.create(:status => 'disable', :flag => 'build')
+      p.flags.create(:status => 'disable', :flag => 'publish')
 
       oprj.linkedprojects.each do |l|
 
         p.linkedprojects.create( :linked_remote_project_name => l.linked_remote_project_name , :position => l.position ) if l.linked_remote_project_name
-        p.linkedprojects.create( :linked_db_project => l.linked_db_project.name , :position => l.position ) if l.linked_db_project
+        p.linkedprojects.create( :linked_db_project => DbProject.get_by_name(l.linked_db_project.name) , :position => l.position ) if l.linked_db_project
       end
 
       oprj.repositories.each do |repo|
@@ -1529,8 +1521,8 @@ class SourceController < ApplicationController
     if params.has_key? :nodelay
       do_project_copy(project_name, params)
       p = DbProject.get_by_name project_name
-      p.flags.delete_if { |f| f.flag == "build" and f.status == "disable" }
-      p.flags.delete_if { |f| f.flag == "publish" and f.status == "disable" }
+      p.flags.delete_if { |f| f.flag == "build" and f.status == "disable" and f.architecture.nil? and f.repo.nil? and f.package.nil? }
+      p.flags.delete_if { |f| f.flag == "publish" and f.status == "disable" and f.architecture.nil? and f.repo.nil? and f.package.nil? }
       p.store
       render_ok
     else
