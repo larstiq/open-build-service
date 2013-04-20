@@ -1571,6 +1571,13 @@ sub dobuild {
   } else {
     push @args, '--root', $buildroot;
   }
+  if (-e "$srcdir/_ccache") {
+    if (($BSConfig::ccacheprjs && grep {"$projid" =~ /^$_$/} @$BSConfig::ccacheprjs) && 
+        ($BSConfig::ccachepkgs && grep {"$packid" =~ /^$_$/} @$BSConfig::ccachepkgs)) {
+        print "found ccache flag, enabling ccache...\n";
+        push @args, '--ccache';
+    }
+  }
   push @args, '--clean';
   push @args, '--changelog';
   push @args, '--oldpackages', $oldpkgdir if $oldpkgdir && -d $oldpkgdir;

@@ -142,7 +142,20 @@ our $relsync_pool = {
 #our $powerhosts  = ["build20"];
 
 # List of power packages that can be built on power hosts 
-#our $powerpkgs = [ "glibc", "qt" ]
+#our $powerpkgs = [ "glibc", "qt" ];
+
+# If workers are patched to enable ccache usage, you can use these
+# settings to control which projects and packages are allowed to do so
+# Make sure you anticipate the network and disk usage of the generated ccache dbs
+# List of projects allowed to use ccache
+#our $ccacheprjs = ["home:Admin"];
+# This allows all projects to use ccache
+#our $ccacheprjs = [".*"];
+
+# List of packages allowed to use ccache
+#our $ccachepkgs = [ "glibc", "qt" ];
+# if this is set to powerpkgs only powerhost will be using ccache
+#our $ccachepkgs = $powerpkgs;
 
 #No extra stage server sync
 #our $stageserver = 'rsync://127.0.0.1/put-repos-main';
