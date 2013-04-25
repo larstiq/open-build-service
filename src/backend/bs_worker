@@ -1362,6 +1362,25 @@ sub getoldpackages {
   rmdir($odir);	# if not needed
 }
 
+sub findpackage_ccache {
+  my ($buildinfo, $odir) = @_;
+
+  for my $path (@{$buildinfo->{'path'}}) {
+    # get a package ccache.db if it exists
+    mkdir_p($odir) || die("mkdir_p $odir: $!\n");
+    eval {
+      my $res = BSRPC::rpc({
+        'uri' => "$path->{'server'}/build/$path->{'project'}/$path->{'repository'}/$buildinfo->{'arch'}/$buildinfo->{'package'}",
+        'directory' => $odir,
+        'timeout' => $gettimeout,
+        'receiver' => \&BSHTTP::cpio_receiver,
+      }, undef, 'view=cpio', 'binary=ccache.db');
+    };
+    warn($@) if $@;
+    last if -e "$odir/ccache.db";
+  }
+  rmdir($odir); # if not needed
+}
 
 sub patchkiwi {
   my ($buildinfo, $kiwifile, $meta) = @_;
@@ -1464,7 +1483,8 @@ sub dobuild {
   if ($vm_tmpfs_mode) {
     my @targs;
     # Note that the xen/kvm vmdisk_rootsize is in MB
-    push @targs, "mount", "-t", "tmpfs", "-osize=${vmdisk_rootsize}M", "none", $buildroot;
+    my $tmpfssize = $vmdisk_rootsize + $vmdisk_swapsize + 1024;
+    push @targs, "mount", "-t", "tmpfs", "-osize=${tmpfssize}M", "none", $buildroot;
     qsystem(@targs) && die("mount tmpfs failed: $!\n");
   }
 
@@ -1576,6 +1596,10 @@ sub dobuild {
         ($BSConfig::ccachepkgs && grep {"$packid" =~ /^$_$/} @$BSConfig::ccachepkgs)) {
         print "found ccache flag, enabling ccache...\n";
         push @args, '--ccache';
+        if ( ! -e "$oldpkgdir/ccache.db" ) {
+            print "no ccache db in this package, searching up the build path...\n";
+            findpackage_ccache($buildinfo, $oldpkgdir);
+        }
     }
   }
   push @args, '--clean';
