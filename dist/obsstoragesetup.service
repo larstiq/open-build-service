@@ -1,0 +1,18 @@
+[Unit]
+SourcePath=/etc/init.d/obsstoragesetup
+Description=LSB: Finds the storage device to be used for OBS server and/or worker
+Before=mysql.service sshd.service
+After=xendomains.service haveged.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+Restart=no
+TimeoutSec=5min
+IgnoreSIGPIPE=no
+KillMode=process
+GuessMainPID=no
+RemainAfterExit=yes
+ExecStart=/etc/init.d/obsstoragesetup start
+ExecStop=/etc/init.d/obsstoragesetup stop
+ExecReload=/etc/init.d/obsstoragesetup reload
