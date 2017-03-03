@@ -1,0 +1,18 @@
+[Unit]
+SourcePath=/etc/init.d/obsworker
+Description=LSB: Open Build Service worker
+Before=multi-user.target graphical.target
+After=time-sync.target network-online.target remote-fs.target obsstoragesetup.service obssrcserver.service obsrepserver.service xendomains.service
+Wants=time-sync.target network-online.target
+
+[Service]
+Type=forking
+Restart=no
+TimeoutSec=5min
+IgnoreSIGPIPE=no
+KillMode=process
+GuessMainPID=no
+RemainAfterExit=yes
+ExecStart=/etc/init.d/obsworker start
+ExecStop=/etc/init.d/obsworker stop
+ExecReload=/etc/init.d/obsworker reload
