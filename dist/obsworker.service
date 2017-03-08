@@ -16,4 +16,4 @@ RemainAfterExit=yes
 ExecStart=/etc/init.d/obsworker start
 ExecStop=/etc/init.d/obsworker stop
 ExecReload=/etc/init.d/obsworker reload
-TaskMax=2048
+TasksMax=2048
